@@ -1,25 +1,29 @@
-import { useAuth } from "@/hooks/useAuth"
+import auth from "@/config/auth"
+import BlankLayout from "@/layout/BlankLayout"
+import axios from "axios"
 import { TextInput } from "flowbite-react"
 import Link from "next/link"
-import { useCallback } from "react"
+import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 
-const LoginPage = () => {
-    const authContext = useAuth()
-    const { login } = authContext
-
+const index = () => {
+    const router = useRouter()
     const defaultValues = {
         username: '',
         password: ''
     }
 
-    const onSubmit = useCallback(async (data) => {
+    const onSubmit = (data) => {
         console.log(data)
-        
-        login(data, (error) => {
-            console.log(error)
-        })
-      }, [])
+        axios.post(auth.registerUrl, data)
+            .then((response) => {
+                console.log(response)
+                router.replace('/login')
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     const {
         register,
@@ -39,12 +43,14 @@ const LoginPage = () => {
                         <label htmlFor="password">Password</label>
                         <TextInput required {...register('password')} type="password" id="password" placeholder="isi password anda" />
                     </div>
-                    <button type="submit">Login</button>
+                    <button type="submit">Register</button>
                 </form>
-                <Link href={'/register'}>Belum Punya Akun? Register</Link>
+                <Link href={'/login'} >Punya Akun? Login</Link>
             </div>
         </div>
     )
 }
 
-export default LoginPage
+index.getLayout = page => <BlankLayout>{page}</BlankLayout>
+
+export default index
